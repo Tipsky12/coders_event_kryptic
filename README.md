@@ -3,7 +3,6 @@
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.x-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0%2B-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 A web-based inventory and equipment loan management system developed for academic and institutional facilities. The platform provides administrators with centralized oversight across equipment categories, piece-level tracking, loan issuance with automated return deadlines, condition inspections upon check-in, and real-time overdue detection.
 
@@ -80,7 +79,6 @@ A web-based inventory and equipment loan management system developed for academi
 ```
 .
 ├── app.py                   # Flask server, route controllers, and database initialization
-├── trial.py                 # Original CLI utility script for inventory operations
 ├── requirements.txt         # Python project dependencies
 ├── .gitignore               # Git ignored file patterns
 ├── README.md                # Project documentation
@@ -195,8 +193,3 @@ http://127.0.0.1:5000
 4. **Equipment Return**: Access the Return section, enter the piece code, and assign the verified physical condition (`Perfect` or `Damaged`).
 5. **Inventory Inspection**: View the master inventory counts or inspect individual pieces with location and loan metadata.
 
----
-
-## License
-
-This project is distributed under the terms of the [MIT License](LICENSE).

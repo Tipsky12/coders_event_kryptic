@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Return Item · Inventory & Access</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styling.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboardstyle.css') }}">
+</head>
+
+<body style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+    <div style="width: 100%; max-width: 480px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+        <a href="{{ url_for('dashboard_page') }}" class="nav-btn">← Back to Dashboard</a>
+        <a href="{{ url_for('logout') }}" class="logout">Sign out</a>
+    </div>
+
+    <main class="card" style="max-width: 480px;">
+        <section>
+            <h1>Return an Item</h1>
+            <p class="sub">Check-in returned equipment and verify its physical condition</p>
+
+            {% if error %}
+            <div class="alert-box alert-error">{{ error }}</div>
+            {% endif %}
+
+            {% if success %}
+            <div class="alert-box alert-success">{{ success }}</div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('return_page') }}">
+                <label for="piece_code">Piece Code (e.g., RAQ01, BAL02, DRB03)</label>
+                <div class="field">
+                    <input id="piece_code" name="piece_code" type="text" placeholder="Enter Piece Code" value="{{ prefill_piece or '' }}" required style="text-transform: uppercase;">
+                </div>
+
+                <label for="item_condition">Condition on Return</label>
+                <div class="field">
+                    <select id="item_condition" name="item_condition" required>
+                        <option value="Perfect" selected>Perfect (Ready for re-issue)</option>
+                        <option value="Damaged">Damaged (Requires maintenance / repair)</option>
+                    </select>
+                </div>
+
+                <p style="font-size: .8rem; color: var(--muted); margin-top: 12px;">
+                    ⚠️ Note: Damaged items are returned to inventory but will not be marked available for loan.
+                </p>
+
+                <button class="go" type="submit">Complete Return</button>
+            </form>
+        </section>
+    </main>
+</body>
+
+</html>

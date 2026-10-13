@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Dashboard · Inventory & Access</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboardstyle.css') }}">
+</head>
+
+<body>
+    <div class="wrap">
+        <header>
+            <div>
+                <h1>Dashboard</h1>
+                <p class="sub" id="who">Logged in as {{ user }}</p>
+            </div>
+            <div class="btn-group">
+                <a href="{{ url_for('logout') }}" class="logout" id="out">Sign out</a>
+            </div>
+        </header>
+
+        <div class="grid">
+            <a class="tile" href="{{ url_for('inventory_page') }}">
+                <div class="icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 8l-9-5-9 5 9 5 9-5z" />
+                        <path d="M3 8v8l9 5 9-5V8" />
+                        <path d="M12 13v8" />
+                    </svg>
+                </div>
+                <h2>Show inventory</h2>
+                <p>Browse everything in stock</p>
+            </a>
+
+            <a class="tile" href="{{ url_for('items_page') }}">
+                <div class="icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="16" rx="2" />
+                        <path d="M3 10h18M3 15h18M9 4v16" />
+                    </svg>
+                </div>
+                <h2>Show item table</h2>
+                <p>View all items in a table</p>
+            </a>
+
+            <a class="tile" href="{{ url_for('issue_page') }}">
+                <div class="icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 19V5M5 12l7-7 7 7" />
+                    </svg>
+                </div>
+                <h2>Issue</h2>
+                <p>Issue an item to a user</p>
+            </a>
+
+            <a class="tile" href="{{ url_for('return_page') }}">
+                <div class="icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 5v14M19 12l-7 7-7-7" />
+                    </svg>
+                </div>
+                <h2>Return</h2>
+                <p>Record a returned item</p>
+            </a>
+        </div>
+
+        <section class="overdue" id="overdue">
+            <h2>Overdue Items <span class="badge" id="overdue-count">!</span></h2>
+            <div id="overdue-content">
+                Loading overdue information…
+            </div>
+        </section>
+    </div>
+
+    <script>
+        async function loadOverdue() {
+            const container = document.getElementById("overdue-content");
+            const badge = document.getElementById("overdue-count");
+            try {
+                const res = await fetch("/api/overdue");
+                const data = await res.json();
+                if (!data.items || data.items.length === 0) {
+                    container.innerHTML = "<p style='margin:0; color: var(--muted);'>No items are currently overdue.</p>";
+                    badge.style.display = "none";
+                    return;
+                }
+
+                badge.textContent = data.items.length;
+                let html = `
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Piece Code</th>
+                                    <th>Item Name</th>
+                                    <th>Issuer</th>
+                                    <th>Email</th>
+                                    <th>Issued On</th>
+                                    <th>Due Date</th>
+                                    <th>Days Late</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                for (const item of data.items) {
+                    html += `
+                        <tr>
+                            <td><strong>${item.item_code}</strong></td>
+                            <td>${item.name}</td>
+                            <td>${item.issuer_name || '-'}</td>
+                            <td>${item.mail_id || '-'}</td>
+                            <td>${item.date_of_issue || '-'}</td>
+                            <td>${item.return_date || '-'}</td>
+                            <td><span class="badge-overdue">${item.days_late} days</span></td>
+                        </tr>
+                    `;
+                }
+                html += `</tbody></table></div>`;
+                container.innerHTML = html;
+            } catch (err) {
+                container.innerHTML = "<p style='margin:0; color: var(--err);'>Could not load overdue items.</p>";
+            }
+        }
+
+        loadOverdue();
+    </script>
+</body>
+
+</html>

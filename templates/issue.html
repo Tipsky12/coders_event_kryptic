@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Issue Item · Inventory & Access</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styling.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboardstyle.css') }}">
+</head>
+
+<body style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+    <div style="width: 100%; max-width: 480px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+        <a href="{{ url_for('dashboard_page') }}" class="nav-btn">← Back to Dashboard</a>
+        <a href="{{ url_for('logout') }}" class="logout">Sign out</a>
+    </div>
+
+    <main class="card" style="max-width: 480px;">
+        <section>
+            <h1>Issue an Item</h1>
+            <p class="sub">Assign inventory equipment for a 15-day loan period</p>
+
+            {% if error %}
+            <div class="alert-box alert-error">{{ error }}</div>
+            {% endif %}
+
+            {% if success %}
+            <div class="alert-box alert-success">{{ success }}</div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('issue_page') }}">
+                <label for="piece_code">Piece Code (e.g., RAQ01, BAL03, CHR02)</label>
+                <div class="field">
+                    <input id="piece_code" name="piece_code" type="text" placeholder="Enter Piece Code" value="{{ prefill_piece or '' }}" required style="text-transform: uppercase;">
+                </div>
+
+                <label for="issuer_name">Issuer Full Name</label>
+                <div class="field">
+                    <input id="issuer_name" name="issuer_name" type="text" placeholder="e.g. John Doe" required>
+                </div>
+
+                <div style="margin-top: 14px; padding: 10px 14px; background: color-mix(in srgb, var(--brand) 8%, var(--bg)); border: 1px solid var(--line); border-radius: 10px; font-size: .85rem;">
+                    <span style="color: var(--muted);">Issuing Account:</span> <strong>{{ logged_in_user }}</strong>
+                </div>
+
+                <p style="font-size: .8rem; color: var(--muted); margin-top: 12px;">
+                    ℹ️ Allowed loan period is 15 days from today. Overdue notices will be automatically flagged.
+                </p>
+
+                <button class="go" type="submit">Issue Equipment</button>
+            </form>
+        </section>
+    </main>
+</body>
+
+</html>

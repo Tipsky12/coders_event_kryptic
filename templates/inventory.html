@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Master Inventory · Inventory & Access</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboardstyle.css') }}">
+</head>
+
+<body>
+    <div class="wrap">
+        <header>
+            <div>
+                <h1>School Inventory Overview</h1>
+                <p class="sub">Total stock and current availability summary</p>
+            </div>
+            <div class="btn-group">
+                <a href="{{ url_for('dashboard_page') }}" class="nav-btn">← Back to Dashboard</a>
+                <a href="{{ url_for('logout') }}" class="logout">Sign out</a>
+            </div>
+        </header>
+
+        <div class="content-card">
+            <div class="filter-bar">
+                <div>
+                    <h2 style="margin: 0; font-size: 1.2rem;">Inventory Stock</h2>
+                    <p style="margin: 4px 0 0; color: var(--muted); font-size: .85rem;">Overview of all registered school assets</p>
+                </div>
+                <div class="btn-group">
+                    <a href="{{ url_for('items_page') }}" class="nav-btn">View Detailed Pieces →</a>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Item Code</th>
+                            <th>Item Name</th>
+                            <th>Category</th>
+                            <th>Total Quantity</th>
+                            <th>Available</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in inventory %}
+                        <tr>
+                            <td><strong>{{ row.item_code }}</strong></td>
+                            <td>{{ row.name }}</td>
+                            <td>{{ row.category }}</td>
+                            <td>{{ row.qty }}</td>
+                            <td>
+                                {% if row.no_avail > 0 %}
+                                    <span class="status-pill status-available">{{ row.no_avail }} available</span>
+                                {% else %}
+                                    <span class="status-pill status-damaged">0 available</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('items_page', item=row.tbl_key) }}" class="nav-btn" style="padding: 4px 10px; font-size: .8rem;">Inspect Pieces</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styling.css') }}">
+    <title>Sign in · Inventory & Access</title>
+</head>
+
+<body>
+    <main class="card">
+        <section id="form">
+            <h1>Login</h1>
+            <p class="sub">Sign in to the Inventory & Access Request portal</p>
+            <form id="f" novalidate>
+                <label for="em">Email</label>
+                <div class="field">
+                    <input id="em" type="email" autocomplete="username" placeholder="name@nfsu.ac.in" required>
+                </div>
+                <label for="pw">Password</label>
+                <div class="field">
+                    <input id="pw" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+                    <button type="button" class="toggle" id="tg">Show</button>
+                </div>
+                <p class="msg" id="msg" role="alert"></p>
+                <button class="go" id="btn" type="submit">Sign in</button>
+            </form>
+            <p class="foot">Only @nfsu.ac.in accounts are permitted</p>
+        </section>
+    </main>
+    <script>
+        const DOMAIN = "@nfsu.ac.in";
+        const $ = id => document.getElementById(id);
+        
+        function err(t, ...bad) {
+            $("msg").textContent = t;
+            ["em", "pw"].forEach(i => $(i).classList.toggle("bad", bad.includes(i)));
+        }
+
+        $("tg").onclick = () => {
+            const s = $("pw").type === "password";
+            $("pw").type = s ? "text" : "password";
+            $("tg").textContent = s ? "Hide" : "Show";
+        };
+
+        $("f").onsubmit = async e => {
+            e.preventDefault();
+            err("");
+            const em = $("em").value.trim().toLowerCase();
+            const pw = $("pw").value;
+
+            if (!em) return err("Please enter your email.", "em");
+            if (!em.endsWith(DOMAIN) || em.length <= DOMAIN.length || em.split("@").length !== 2) {
+                return err("Email must end with " + DOMAIN, "em");
+            }
+            if (!pw) return err("Please enter your password.", "pw");
+
+            $("btn").disabled = true;
+            $("btn").textContent = "Signing in…";
+
+            try {
+                const res = await fetch("/api/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email: em, password: pw })
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    $("btn").disabled = false;
+                    $("btn").textContent = "Sign in";
+                    return err(data.message || "Incorrect email or password.", "em", "pw");
+                }
+                try { sessionStorage.setItem("loggedInUser", em); } catch (x) { }
+                window.location.href = "/dashboard";
+            } catch (error) {
+                $("btn").disabled = false;
+                $("btn").textContent = "Sign in";
+                return err("Connection error. Please try again.", "em", "pw");
+            }
+        };
+    </script>
+</body>
+
+</html>

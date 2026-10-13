@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Item Pieces · Inventory & Access</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboardstyle.css') }}">
+</head>
+
+<body>
+    <div class="wrap">
+        <header>
+            <div>
+                <h1>Item Pieces Details</h1>
+                <p class="sub">View and track individual pieces by equipment type</p>
+            </div>
+            <div class="btn-group">
+                <a href="{{ url_for('dashboard_page') }}" class="nav-btn">← Back to Dashboard</a>
+                <a href="{{ url_for('logout') }}" class="logout">Sign out</a>
+            </div>
+        </header>
+
+        <div class="content-card">
+            <div class="filter-bar">
+                <form method="GET" action="{{ url_for('items_page') }}" id="filterForm">
+                    <label for="itemSelect" style="font-weight: 600; font-size: .88rem; margin-right: 8px;">Select Equipment:</label>
+                    <select name="item" id="itemSelect" class="filter-select" onchange="document.getElementById('filterForm').submit()">
+                        {% for key, info in items_dict.items() %}
+                        <option value="{{ key }}" {% if key == selected_item %}selected{% endif %}>
+                            {{ info[1] }} ({{ info[2] }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </form>
+
+                <div class="btn-group">
+                    <a href="{{ url_for('issue_page') }}" class="nav-btn">+ Issue Item</a>
+                    <a href="{{ url_for('return_page') }}" class="nav-btn">↺ Return Item</a>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Piece Code</th>
+                            <th>Item Name</th>
+                            <th>Condition</th>
+                            <th>Status</th>
+                            <th>Issuer Name</th>
+                            <th>Issuer Mail</th>
+                            <th>Date of Issue</th>
+                            <th>Due Date</th>
+                            <th>Storage Location</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in pieces %}
+                        <tr>
+                            <td><strong>{{ row.item_code }}</strong></td>
+                            <td>{{ row.name }}</td>
+                            <td>
+                                {% if row.item_condition == 'Perfect' %}
+                                    <span class="status-pill status-available">Perfect</span>
+                                {% else %}
+                                    <span class="status-pill status-damaged">Damaged</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if row.status == 'Available' %}
+                                    <span class="status-pill status-available">Available</span>
+                                {% else %}
+                                    <span class="status-pill status-issued">Issued</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ row.issuer_name or '-' }}</td>
+                            <td>{{ row.mail_id or '-' }}</td>
+                            <td>{{ row.date_of_issue or '-' }}</td>
+                            <td>{{ row.return_date or '-' }}</td>
+                            <td>{{ row.storage_location or '-' }}</td>
+                            <td>
+                                {% if row.status == 'Available' and row.item_condition != 'Damaged' %}
+                                    <a href="{{ url_for('issue_page', piece=row.item_code) }}" class="nav-btn" style="padding: 4px 10px; font-size: .8rem;">Issue</a>
+                                {% elif row.status == 'Issued' %}
+                                    <a href="{{ url_for('return_page', piece=row.item_code) }}" class="nav-btn" style="padding: 4px 10px; font-size: .8rem; border-color: var(--err); color: var(--err);">Return</a>
+                                {% else %}
+                                    <span style="font-size: .8rem; color: var(--muted);">Unavailable</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
